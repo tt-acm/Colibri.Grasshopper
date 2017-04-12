@@ -7,7 +7,7 @@ using Grasshopper.Kernel;
 using Rhino.Display;
 using Rhino.Geometry;
 
-namespace Aggregator
+namespace Colibri.Grasshopper
 {
     public class Aggregator : GH_Component
     {
@@ -25,7 +25,7 @@ namespace Aggregator
         {
         }
 
-        public override GH_Exposure Exposure { get {return GH_Exposure.tertiary;} }
+        public override GH_Exposure Exposure { get { return GH_Exposure.tertiary; } }
 
         /// <summary>
         /// Registers all the input parameters for this component.
@@ -36,6 +36,7 @@ namespace Aggregator
             pManager.AddTextParameter("Inputs", "Inputs", "Inputs object from the Colibri Iterator compnent.", GH_ParamAccess.list);
             pManager.AddTextParameter("Outputs", "Outputs", "Outputs object from the Colibri Outputs component.", GH_ParamAccess.list);
             pManager.AddTextParameter("ImgParams", "ImgParams", "ImgParams object from the Colibri ImageParameters component.", GH_ParamAccess.list);
+            //pManager[3].Optional = true;
             pManager.AddBooleanParameter("Write?", "Write?", "Set to true to write files to disk.", GH_ParamAccess.item);
         }
 
@@ -65,7 +66,7 @@ namespace Aggregator
             List<string> outputs = new List<string>();
             List<string> imgParams = new List<string>();
             bool writeFile = false;
-            
+
             //get data
             DA.GetData(0, ref folder);
             DA.GetDataList(1, inputs);
@@ -86,7 +87,7 @@ namespace Aggregator
             string imgPath = "";
             string keyReady = "";
             string valueReady = "";
-            
+
 
             //format write in data
             for (int i = 0; i < rawData.Count; i++)
@@ -95,13 +96,13 @@ namespace Aggregator
                 string dataKey = item.Split(',')[0];
                 string dataValue = item.Split(',')[1];
 
-                if (i > 0) 
+                if (i > 0)
                 {
 
                     if (i < inDataLength)
                     {
                         keyReady += ",in:" + dataKey;
-                        
+
                     }
                     else
                     {
@@ -119,14 +120,14 @@ namespace Aggregator
                     valueReady += dataValue;
                     imgName = dataValue;
                 }
-                
+
             }
 
-            
-            
+
+
             bool run = writeFile;
             string fileName = imgName;
-            imgPath = folder+"/"+imgName + ".png";
+            imgPath = folder + "/" + imgName + ".png";
             imgName += ".png";
             string jsonFilePath = folder + "/" + fileName + ".json";
             string jsonFileName = fileName + ".json";
@@ -134,7 +135,7 @@ namespace Aggregator
             //int width = 500;
             //int height = 500;
             List<int> cleanedImgParams = new List<int>();
-            foreach (string item in imgParams) 
+            foreach (string item in imgParams)
             {
                 string cleanItem = Convert.ToString(item).Replace("[", "").Replace("]", "").Replace(" ", "");
                 //string dataValue = cleanItem.Split(',')[1];
@@ -173,7 +174,7 @@ namespace Aggregator
 
 
             }
-            
+
             //set output
             //DA.SetData(0, writeInData);
             DA.SetData(0, jsonFilePath);

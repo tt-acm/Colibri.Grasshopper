@@ -34,6 +34,7 @@ namespace Colibri.Grasshopper
             pManager[1].Optional = true;
             pManager.AddIntegerParameter("Width", "Width", "Image width in pixels.", GH_ParamAccess.item, 600);
             pManager.AddIntegerParameter("Height", "Height", "Image height in pixels.", GH_ParamAccess.item, 600);
+            pManager.AddBooleanParameter("Active", "Active", "True if recording images.", GH_ParamAccess.item, true);
 
         }
 
@@ -57,12 +58,14 @@ namespace Colibri.Grasshopper
             var viewNames = new List<string>();
             int width = 600;
             int height = 600;
+            bool active = true;
 
             //get data
             DA.GetData(0, ref imgName);
             DA.GetDataList(1, viewNames);
             DA.GetData(2, ref width);
             DA.GetData(3, ref height);
+            DA.GetData(4, ref active);
             //defense
             if (width < 50 || height < 50)
             {
@@ -71,7 +74,7 @@ namespace Colibri.Grasshopper
             }
 
             //set output
-            var imageP = new ImgParam(imgName, viewNames, width, height);
+            var imageP = new ImgParam(imgName, viewNames, width, height, active);
             //var imageP = new Dictionary<string, object>();
             //imageP.Add("imgName", imgName);
             //imageP.Add("viewNames", viewNames);

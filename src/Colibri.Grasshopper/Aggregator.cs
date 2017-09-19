@@ -390,87 +390,95 @@ namespace Colibri.Grasshopper
 
         private string captureViews(ImgParam imgParams,string flyID)
         {
-            //string imgID = flyID;
-            var ViewNames = new List<string>();
-            int width = 600;
-            int height = 600;
-
-            
-            string imgName = flyID;
-            string imgPath = string.Empty;
-
-            var imgCSV = new List<string>();
-
-
-            // overwrite the image parameter setting if user has inputed the values
-            if (imgParams.IsDefined)
+            if (imgParams.IsActive)
             {
-                bool isThereNoImgName = imgParams.SaveName == "defaultName";
-                imgName = isThereNoImgName ? imgName : imgParams.SaveName;
-                ViewNames = imgParams.ViewNames;
-                width = imgParams.Width;
-                height = imgParams.Height;
+                //string imgID = flyID;
+                var ViewNames = new List<string>();
+                int width = 600;
+                int height = 600;
 
-            }
 
-            Size imageSize = new Size(width, height);
-            //If ViewNames is empty, which means to capture current active view
-            var activeView = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-            if (!ViewNames.Any())
-            {
-                imgName += ".png";
-                imgPath = Folder + @"\" + imgName;
+                string imgName = flyID;
+                string imgPath = string.Empty;
 
-                activeView.Redraw();
-                
-                var pic = activeView.CaptureToBitmap(imageSize);
-                pic.Save(imgPath);
+                var imgCSV = new List<string>();
 
-                //return here, and skip the following views' check
-                return imgName;
 
-            }
-            
-            //If user set View Names
-            var views = Rhino.RhinoDoc.ActiveDoc.Views.ToDictionary(v => v.ActiveViewport.Name, v => v);
-            var namedViews = Rhino.RhinoDoc.ActiveDoc.NamedViews.ToDictionary(v => v.Name, v => v);
-
-            //string newImgPathWithViewName = ImagePath;
-            string currentImgName = imgName;
-            for (int i = 0; i < ViewNames.Count; i++)
-            {
-                
-                string viewName = ViewNames[i];
-                string existViewName = string.Empty;
-                
-                if (views.ContainsKey(viewName))
+                // overwrite the image parameter setting if user has inputed the values
+                if (imgParams.IsDefined)
                 {
-                    activeView = views[viewName];
-                    existViewName = viewName;
+                    bool isThereNoImgName = imgParams.SaveName == "defaultName";
+                    imgName = isThereNoImgName ? imgName : imgParams.SaveName;
+                    ViewNames = imgParams.ViewNames;
+                    width = imgParams.Width;
+                    height = imgParams.Height;
+
                 }
-                else if(namedViews.ContainsKey(viewName))
+
+                Size imageSize = new Size(width, height);
+                //If ViewNames is empty, which means to capture current active view
+                var activeView = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
+                if (!ViewNames.Any())
                 {
-                    existViewName = viewName;
-                    var namedViewIndex = Rhino.RhinoDoc.ActiveDoc.NamedViews.FindByName(viewName);
-                    Rhino.RhinoDoc.ActiveDoc.NamedViews.Restore(namedViewIndex, Rhino.RhinoDoc.ActiveDoc.Views.ActiveView, true);
-                }
-                
-                //capture
-                if (!string.IsNullOrEmpty(existViewName))
-                {
-                    currentImgName = imgName+ "_" + existViewName + ".png";
-                    imgCSV.Add(currentImgName);
-                    imgPath = Folder + @"\" + currentImgName;
-                    //save imgs
+                    imgName += ".png";
+                    imgPath = Folder + @"\" + imgName;
+
                     activeView.Redraw();
+
                     var pic = activeView.CaptureToBitmap(imageSize);
                     pic.Save(imgPath);
-                    
+
+                    //return here, and skip the following views' check
+                    return imgName;
+
                 }
 
+                //If user set View Names
+                var views = Rhino.RhinoDoc.ActiveDoc.Views.ToDictionary(v => v.ActiveViewport.Name, v => v);
+                var namedViews = Rhino.RhinoDoc.ActiveDoc.NamedViews.ToDictionary(v => v.Name, v => v);
+
+                //string newImgPathWithViewName = ImagePath;
+                string currentImgName = imgName;
+                for (int i = 0; i < ViewNames.Count; i++)
+                {
+
+                    string viewName = ViewNames[i];
+                    string existViewName = string.Empty;
+
+                    if (views.ContainsKey(viewName))
+                    {
+                        activeView = views[viewName];
+                        existViewName = viewName;
+                    }
+                    else if (namedViews.ContainsKey(viewName))
+                    {
+                        existViewName = viewName;
+                        var namedViewIndex = Rhino.RhinoDoc.ActiveDoc.NamedViews.FindByName(viewName);
+                        Rhino.RhinoDoc.ActiveDoc.NamedViews.Restore(namedViewIndex, Rhino.RhinoDoc.ActiveDoc.Views.ActiveView, true);
+                    }
+
+                    //capture
+                    if (!string.IsNullOrEmpty(existViewName))
+                    {
+                        currentImgName = imgName + "_" + existViewName + ".png";
+                        imgCSV.Add(currentImgName);
+                        imgPath = Folder + @"\" + currentImgName;
+                        //save imgs
+                        activeView.Redraw();
+                        var pic = activeView.CaptureToBitmap(imageSize);
+                        pic.Save(imgPath);
+
+                    }
+
+                }
+
+                return string.Join(",", imgCSV);
+
             }
-            
-            return string.Join(",", imgCSV); ;
+            else
+            {
+                return "";
+            }
             
         }
 

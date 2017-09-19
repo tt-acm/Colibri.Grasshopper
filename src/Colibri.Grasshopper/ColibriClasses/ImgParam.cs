@@ -9,6 +9,7 @@ namespace Colibri.Grasshopper
     public class ImgParam
     {
         public bool IsDefined { get; set; }
+        public bool IsActive { get; set; }
         public string SaveName { get; set; }
         public List<string> ViewNames { get; set; }
         public int Width { get; set; }
@@ -18,30 +19,40 @@ namespace Colibri.Grasshopper
         {
             this.IsDefined = false;
         }
-        public ImgParam(string SaveName, List<string> ViewNames, int Width = 600, int Height = 600)
+        public ImgParam(string SaveName, List<string> ViewNames, int Width = 600, int Height = 600, bool isActive = true)
         {
             this.IsDefined = true;
             this.SaveName = SaveName;
             this.ViewNames = ViewNames;
             this.Width = Width;
             this.Height = Height;
+            this.IsActive = isActive;
         }
 
         public override string ToString()
         {
-
-            string output = "SaveName:" + SaveName + ";\n";
-            if (ViewNames.Count == 0)
+            if (IsActive)
             {
-                ViewNames.Add("ActiveView");
+                string output = "SaveName:" + SaveName + ";\n";
+                if (ViewNames.Count == 0)
+                {
+                    ViewNames.Add("ActiveView");
+                }
+                string vName = "ViewNames:" + string.Join(",", ViewNames) + ";\n";
+
+                output += vName;
+                output += "Width:" + Width.ToString() + ";\n";
+                output += "Height:" + Height.ToString() + ";";
+
+                return output;
             }
-            string vName = "ViewNames:" + string.Join(",", ViewNames) + ";\n";
+            else
+            {
+                return "Inactive: Not Saving Images.";
+            }
+            
 
-            output += vName;
-            output += "Width:" + Width.ToString() + ";\n";
-            output += "Height:" + Height.ToString() + ";";
-
-            return output;
+            
         }
     }
 }
